@@ -8,24 +8,30 @@ import java.awt.image.BufferedImage;
  */
 public class Window extends JFrame {
 
+    private JPanel imagePanel;
+
     public Window(String title) throws HeadlessException {
         super(title);
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        imagePanel = new JPanel();
+        //imagePanel.setLayout(new FlowLayout(FlowLayout.TRAILING,0,0));
+        add(imagePanel);
     }
 
-    public void setImage(BufferedImage img)
+    public void AddImage(BufferedImage img)
     {
         //convert image to label:
         JLabel imageLabel = new JLabel(new ImageIcon(img));
-        //add image to frame
-        add(imageLabel);
 
-        //resize frame to fit contents and reposition before displaying
+        imagePanel.add(imageLabel);
+
+    }
+
+    public void ShowWindow()
+    {
         pack();
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         this.setLocation((dim.width - this.getWidth())/2, (dim.height - this.getHeight())/2);
         setVisible(true);
-        //setResizable(false);
     }
 }

@@ -5,22 +5,28 @@ import java.awt.image.BufferedImage;
 /**
  * Created by Daniel on 8/8/2014.
  */
-public class Filter2DSeperable extends ImageFilter {
+public class Filter2DSeperableConvolution extends ImageFilter {
 
     private float[] filterRow,filterColumn;
+    private boolean enableThreshold = false;
+    private int threshold;
 
-    Filter2DSeperable()
+    Filter2DSeperableConvolution()
     {
 
     }
 
-    public Filter2DSeperable(float[] filterRow, float[] filterColumn)
+    public Filter2DSeperableConvolution(float[] filterRow, float[] filterColumn)
     {
         this.filterRow = filterRow;
         this.filterColumn = filterColumn;
     }
 
-
+    public Filter2DSeperableConvolution(int threshold)
+    {
+        this.enableThreshold = true;
+        this.threshold = threshold;
+    }
 
     protected void SetSymmetricSeperableFilter(float[] filter)
     {
@@ -31,7 +37,6 @@ public class Filter2DSeperable extends ImageFilter {
     @Override
     public BufferedImage FilterImage(BufferedImage inputImage) {
 
-       // return ConvolveColumns(ConvolveRows(inputImage, filterRow),filterColumn);
         return ConvolveRows(ConvolveColumns(inputImage, filterColumn), filterRow);
     }
 
@@ -60,7 +65,9 @@ public class Filter2DSeperable extends ImageFilter {
                         index = x-offset+j;
                     newValue += ComputePixelIntensity(input.getRGB(index, y))*filter[j];
                 }
-                output.setRGB(x,y,CalcNewPix(newValue));
+                //If if thresholding is disabled or new value exceeds threshold, update the output image.
+                if(!enableThreshold || (enableThreshold && newValue > threshold))
+                    output.setRGB(x,y,CalcNewPix(newValue));
             }
         }
         return output;
