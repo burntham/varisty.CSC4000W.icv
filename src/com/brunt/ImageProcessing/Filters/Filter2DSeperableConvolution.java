@@ -16,6 +16,7 @@ public class Filter2DSeperableConvolution extends ImageFilter {
 
     }
 
+    //Construct a simple object that just works with the default methods
     public Filter2DSeperableConvolution(float[] filterRow, float[] filterColumn)
     {
         this.filterRow = filterRow;
@@ -37,10 +38,10 @@ public class Filter2DSeperableConvolution extends ImageFilter {
     @Override
     public BufferedImage FilterImage(BufferedImage inputImage) {
 
-        return ConvolveRows(ConvolveColumns(inputImage, filterColumn), filterRow);
+        return ConvolveRows(ConvolveColumns(inputImage, filterColumn, false), filterRow,false);
     }
 
-    private BufferedImage ConvolveRows(BufferedImage input, float[] filter)
+    protected BufferedImage ConvolveRows(BufferedImage input, float[] filter, boolean edges)
     {
         BufferedImage output = new BufferedImage(input.getWidth(), input.getHeight(),input.getType());
         int offset = filter.length/2;
@@ -67,13 +68,16 @@ public class Filter2DSeperableConvolution extends ImageFilter {
                 }
                 //If if thresholding is disabled or new value exceeds threshold, update the output image.
                 if(!enableThreshold || (enableThreshold && newValue > threshold))
-                    output.setRGB(x,y,CalcNewPix(newValue));
+                    if(!edges)
+                        output.setRGB(x,y,CalcNewPix(newValue));
+                    else
+                        output.setRGB(x,y,(int)newValue);
             }
         }
         return output;
     }
 
-    private BufferedImage ConvolveColumns(BufferedImage input, float[] filter)
+    protected BufferedImage ConvolveColumns(BufferedImage input, float[] filter, boolean edges)
     {
         BufferedImage output = new BufferedImage(input.getWidth(), input.getHeight(), input.getType());
         int offset = filter.length/2;
@@ -97,7 +101,10 @@ public class Filter2DSeperableConvolution extends ImageFilter {
                         index = y-offset+j;
                     newValue += ComputePixelIntensity(input.getRGB(x, index))*filter[j];
                 }
-                output.setRGB(x,y,CalcNewPix(newValue));
+                if(!edges)
+                    output.setRGB(x,y,CalcNewPix(newValue));
+                else
+                    output.setRGB(x,y,(int)newValue);
             }
         }
         return output;

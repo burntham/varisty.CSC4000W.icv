@@ -1,6 +1,7 @@
 package com.brunt;
 
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
+import com.brunt.ImageProcessing.Filters.SobelFilter;
 import com.brunt.ImageProcessing.ImageManager;
 import com.brunt.Viewer.Window;
 
@@ -17,9 +18,11 @@ public class Main {
         BufferedImage originalImage = ImageManager.ReadImage(args[0]);
 
         //Run a Gaussian Filter with a threshold
-        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1,3,50);
-
+        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2, 30);
         BufferedImage gFilteredImage = gaussian.FilterImage(originalImage);
+
+        SobelFilter sobel = new SobelFilter();
+        BufferedImage sobelOperatedImage = sobel.FilterImage(gFilteredImage);
 
         //create window
         Window displayBox = new Window(imageName);
@@ -27,6 +30,7 @@ public class Main {
         //Add images to window Pane
         displayBox.AddImage(originalImage);
         displayBox.AddImage(gFilteredImage);
+        displayBox.AddImage(sobelOperatedImage);
 
         //display window
         displayBox.ShowWindow();
