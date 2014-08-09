@@ -10,7 +10,7 @@ public class Window extends JFrame {
 
     public Window(String title) throws HeadlessException {
         super(title);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
     }
 
