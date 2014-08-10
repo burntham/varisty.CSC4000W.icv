@@ -33,7 +33,8 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
 //        BufferedImage supressed = NonMaximSuppression(magnitude);
 
         int[][] intMagnitude = GenerateGradientMagnitudes(intGradX,intGradY);
-        BufferedImage testMag = IntArrToBImage(intMagnitude);
+        int[][] supressed = NonMaximSuppression(intMagnitude);
+        BufferedImage testMag = IntArrToBImage(supressed);
         return testMag;
     }
 
@@ -88,35 +89,36 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
         return block;
     }
 
-    private BufferedImage NonMaximSuppression(BufferedImage gradients)
+    private int[][] NonMaximSuppression(int[][] input)
     {
-        BufferedImage newSuppressed = new BufferedImage(gradients.getWidth(),gradients.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int width = input[0].length, height = input.length;
+        int[][] newSuppressed = new int[height][width];
 
-        for (int y=0;y<gradients.getHeight();y++)
+        for (int y=0;y<height;y++)
         {
-            for ( int x=0;x< gradients.getWidth();x++)
+            for ( int x=0;x< width;x++)
             {
-                        int max = gradients.getRGB(x, y) & 0xffffff; int newMax=0;
+                        int max = input[y][x]; int newMax=0;
                         for (int i=-1; i<2;i+=2)
                         {
                            try
                            {
                                if(theta[y][x]!=0) {
                                    if (theta[y][x] == 1 )
-                                       newMax = Math.max(gradients.getRGB(x + i, y) & 0xffffff,newMax);
+                                       newMax = Math.max( input[y][x+i],newMax);
                                    else if (theta[y][x] == 2)
-                                       newMax =Math.max(newMax,gradients.getRGB(x + i, y + i) & 0xffffff);
+                                       newMax =Math.max(newMax, input[y+i][x+i]);
                                    else if (theta[y][x] == 4)
-                                       newMax =Math.max(newMax,gradients.getRGB(x, y + i) & 0xffffff);
+                                       newMax =Math.max(newMax, input[y+i][x]);
                                    else if (theta[y][x] == 8)
-                                       newMax =Math.max(newMax,gradients.getRGB(x + i, y - i) & 0xffffff);
+                                       newMax =Math.max(newMax, input[y-i][x+i]);
                                }
                            }catch (Exception e){
 
                            }
                         }
                     if (max >= newMax)
-                        newSuppressed.setRGB(x,y,max);
+                        newSuppressed[y][x] = max;
                 }
         }
         return newSuppressed;
