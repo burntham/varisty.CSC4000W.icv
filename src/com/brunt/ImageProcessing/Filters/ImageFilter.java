@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
  * Created by Daniel on 8/6/2014.
  */
 public abstract class ImageFilter {
-    public abstract BufferedImage FilterImage(BufferedImage inputImage);
+    public abstract int[][] FilterImage(BufferedImage inputImage);
 
     //Extract pixel intensity from average if RGB values
     public float ComputePixelIntensity(int pixel)

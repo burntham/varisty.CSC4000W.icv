@@ -1,5 +1,7 @@
 package com.brunt.ImageProcessing.Filters;
 
+import com.brunt.ImageProcessing.Utils;
+
 import java.awt.image.BufferedImage;
 
 /**
@@ -36,9 +38,9 @@ public class Filter2DSeperableConvolution extends ImageFilter {
     }
 
     @Override
-    public BufferedImage FilterImage(BufferedImage inputImage) {
+    public int[][] FilterImage(BufferedImage inputImage) {
 
-        return ConvolveRows(ConvolveColumns(inputImage, filterColumn, false), filterRow,false);
+        return Utils.ConvertBuffImageToIntArr(ConvolveRows(ConvolveColumns(inputImage, filterColumn, false), filterRow,false));
     }
 
     protected BufferedImage ConvolveRows(BufferedImage input, float[] filter, boolean edges)
@@ -102,6 +104,7 @@ public class Filter2DSeperableConvolution extends ImageFilter {
                         index = rows-1;
                     else
                         index = y-offset+j;
+
                     newValue += ((!edges)?ComputePixelIntensity(input.getRGB(x, index)):(input.getRGB(x, index))&0xffffff)*filter[j];
                 }
                 if(!edges)

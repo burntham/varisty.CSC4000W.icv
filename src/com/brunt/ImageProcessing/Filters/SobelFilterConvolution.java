@@ -1,7 +1,11 @@
 package com.brunt.ImageProcessing.Filters;
 
+import com.brunt.ImageProcessing.Utils;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * Created by Daniel on 8/9/2014.
@@ -10,32 +14,26 @@ import java.awt.image.BufferedImage;
 public class SobelFilterConvolution extends Filter2DSeperableConvolution {
     private float[] xFilterColumn = {1f,2f,1f}, xfilterRow={-1f,0f,1f}, yFilterColumn ={1f,0f,-1f}, yFilterRow ={1f,2f,1f};
     private int[][] theta;
+    private LinkedList<Point> edges;
     private Filter2DSeperableConvolution gX, gY;
+
+    private LinkedList<Theta> thetas;
 
     public SobelFilterConvolution(){
         super();
     }
 
-    @Override
-    public BufferedImage FilterImage(BufferedImage inputImage) {
+    public int[][] FilterImage(BufferedImage inputImage) {
         //Compute different Axis gradients
-//        BufferedImage gradientX  = ConvolveRows(ConvolveColumns(inputImage, xFilterColumn,true), xfilterRow,true);
-//        BufferedImage gradientY = ConvolveRows(ConvolveColumns(inputImage, yFilterColumn,true), yFilterRow,true);
 
-        int[][] intedImage = BImagetoIntArr(inputImage);
+        int[][] intedImage = Utils.ConvertBuffImageToIntArr(inputImage);
         int[][] intGradX = ConvolveRows(ConvolveColumns(intedImage,xFilterColumn),xfilterRow);
         int[][] intGradY = ConvolveRows(ConvolveColumns(intedImage,yFilterColumn), yFilterRow);
 
-//        int one = gradientX.getRGB(0,0), two = gradientY.getRGB(0,0);
-//
-//        System.out.println(new Color(one)+" "+one +" "+new Color(two) + " "+two);
-//        BufferedImage magnitude = GenerateGradientMagnitudes(gradientX, gradientY);
-//        BufferedImage supressed = NonMaximSuppression(magnitude);
-
         int[][] intMagnitude = GenerateGradientMagnitudes(intGradX,intGradY);
         int[][] supressed = NonMaximSuppression(intMagnitude);
-        BufferedImage testMag = IntArrToBImage(supressed);
-        return testMag;
+        //BufferedImage testMag = Utils.convertIntArrToBufferedImage(supressed);
+        return supressed;
     }
 
     protected int[][] GenerateGradientMagnitudes(int[][] gX, int[][] gY)
@@ -43,19 +41,20 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
         int width=gX[0].length, height = gX.length;
         int[][] out = new int[height][width];
         theta =  new int[height][width];
+        thetas = new LinkedList<Theta>();
 
         //The out buffered image is used to store gradient magnitudes, and as such the normal colour model is ignored - Improvements incoming
-
         for ( int y=0; y< height; y++)
         {
             for ( int x=0; x<width;x++)
             {
                 int gradX = gX[y][x], gradY = gY[y][x];
-                    theta[y][x] = groupAtan(gradX, gradY);
-                    int newVal = (int) Math.sqrt(Math.pow(gradX, 2) + Math.pow(gradY, 2));
+                int newVal = (int) Math.sqrt(Math.pow(gradX, 2) + Math.pow(gradY, 2));
+                if(newVal>1)
+                    thetas.add(new Theta(x,y,groupAtan(gradX,gradY)));
 
-                    //Store Gradient magnitude values in the buffer.
-                    out[y][x]= newVal;
+                //Store Gradient magnitude values in the buffer.
+                out[y][x]= newVal;
             }
         }
         return out;
@@ -63,13 +62,7 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
 
     private int groupAtan(int gradX, int gradY)
     {
-        double theta;
-        try{
-            theta = Math.atan2(gradX,gradY);
-        }catch (Exception e)
-        {
-           theta = 1;//0deg
-        }
+        double theta=0.0f;
 
         theta = Math.abs(theta);
         theta = (theta>180)? theta-180:theta;
@@ -78,13 +71,13 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
 
         //Group Theta into a 'block' either 0,45,90 or 135 - to be used for Non-Maximum Supression
         if ( theta <= 22.5 || theta >= 157.5)
-            block =1;//0deg
+            block =0;//0deg
         else if ( theta <=67.5)
-            block = 2;//45
+            block = 45;//45
         else if(theta<=112.5)
-            block =4;//90
+            block =90;//90
         else
-            block = 8;//135
+            block = 135;//135
 
         return block;
     }
@@ -93,35 +86,48 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
     {
         int width = input[0].length, height = input.length;
         int[][] newSuppressed = new int[height][width];
+        edges = new LinkedList<Point>();
 
-        for (int y=0;y<height;y++)
+        ListIterator<Theta> thetaIterator = thetas.listIterator();
+        while(thetaIterator.hasNext())
         {
-            for ( int x=0;x< width;x++)
+            Theta thetaPoint = thetaIterator.next();
+            int x=(int)thetaPoint.getX(),y= (int)thetaPoint.getY();
+            int max = input[y][x]; int newMax=0;
+            int theta = thetaPoint.getTheta();
+            for (int i=-1; i<2;i+=2)
             {
-                        int max = input[y][x]; int newMax=0;
-                        for (int i=-1; i<2;i+=2)
-                        {
-                           try
-                           {
-                               if(theta[y][x]!=0) {
-                                   if (theta[y][x] == 1 )
-                                       newMax = Math.max( input[y][x+i],newMax);
-                                   else if (theta[y][x] == 2)
-                                       newMax =Math.max(newMax, input[y+i][x+i]);
-                                   else if (theta[y][x] == 4)
-                                       newMax =Math.max(newMax, input[y+i][x]);
-                                   else if (theta[y][x] == 8)
-                                       newMax =Math.max(newMax, input[y-i][x+i]);
-                               }
-                           }catch (Exception e){
-
-                           }
-                        }
-                    if (max >= newMax)
-                        newSuppressed[y][x] = max;
+                try
+                {
+                    if (theta == 0 )
+                        newMax = Math.max( input[y][x+i],newMax);
+                    else if (theta == 45)
+                        newMax =Math.max(newMax, input[y+i][x+i]);
+                    else if (theta == 90)
+                        newMax =Math.max(newMax, input[y+i][x]);
+                    else if (theta == 135)
+                        newMax =Math.max(newMax, input[y-i][x+i]);
                 }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    //Do nothing
+                }
+            }
+            if (max >= newMax)
+            {
+                newSuppressed[y][x] = 255;
+                edges.add(new Point(x,y));
+            }
+            else
+                newSuppressed[y][x]=0;
+
+
         }
         return newSuppressed;
+    }
+
+    public LinkedList<Point> getEdges()
+    {
+        return edges;
     }
 
     protected int[][] ConvolveRows(int[][] input, float[] filter)
@@ -150,7 +156,7 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
 
                     newValue += input[y][index]*filter[j];
                 }
-                        output[y][x] = (int)newValue;
+                output[y][x] = (int)newValue;
             }
         }
         return output;
@@ -182,37 +188,6 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
                     newValue += input[index][x]*filter[j];
                 }
                 output[y][x] = (int)newValue;
-            }
-        }
-        return output;
-    }
-
-    //Convert input image into a int array of intensities.
-    private int[][] BImagetoIntArr(BufferedImage image)
-    {
-        int[][] newRep = new int[image.getHeight()][image.getWidth()];
-
-        for (int y=0; y<image.getHeight();y++)
-        {
-            for ( int x=0; x<image.getWidth();x++)
-            {
-                newRep[y][x] = image.getRGB(x,y) &0xffffff;
-            }
-        }
-
-        return newRep;
-    }
-
-    //Convert int array into BufferedImage -> for Debugging
-    private BufferedImage IntArrToBImage(int[][] input)
-    {
-        BufferedImage output= new BufferedImage(input[0].length, input.length, BufferedImage.TYPE_INT_RGB);
-
-        for ( int y=0; y<input.length; y++)
-        {
-            for (int x=0; x<input[0].length;x++)
-            {
-                output.setRGB(x,y,input[y][x]);
             }
         }
         return output;

@@ -2,7 +2,9 @@ package com.brunt;
 
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
 import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
+import com.brunt.ImageProcessing.HoughTransform;
 import com.brunt.ImageProcessing.ImageManager;
+import com.brunt.ImageProcessing.Utils;
 import com.brunt.Viewer.Window;
 
 import java.awt.*;
@@ -19,18 +21,16 @@ public class Main {
         BufferedImage originalImage = ImageManager.ReadImage(args[0]);
 
         //Run a Gaussian Filter with a threshold
-        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2,80);
-        BufferedImage gFilteredImage = gaussian.FilterImage(originalImage);
+        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,1, 30);
+        BufferedImage gFilteredImage = Utils.convertIntArrToBufferedImage(gaussian.FilterImage(originalImage));
 
         SobelFilterConvolution sobel = new SobelFilterConvolution();
-        BufferedImage sobelOperatedImage = sobel.FilterImage(gFilteredImage);
+        BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
 
-        int test = gFilteredImage.getRGB(180,20)&0xffffff;
-        for ( int i=31; i>=0; i--)
-        {
-            System.out.print(test>>i & 1);
-        }
-        System.out.println("\n"+new Color(test)+" "+ test);
+        int[] range={15,32};
+        HoughTransform hough = new HoughTransform(originalImage,range,1.4f,1,30);
+        hough.detectDiscs();
+        BufferedImage houghTest = hough.drawAccumulator();
         //create window
         Window displayBox = new Window(imageName);
 
@@ -38,6 +38,7 @@ public class Main {
         displayBox.AddImage(originalImage);
         displayBox.AddImage(gFilteredImage);
         displayBox.AddImage(sobelOperatedImage);
+        displayBox.AddImage(houghTest);
 
         //display window
         displayBox.ShowWindow();
