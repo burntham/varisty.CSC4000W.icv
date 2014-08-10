@@ -64,7 +64,7 @@ public class Filter2DSeperableConvolution extends ImageFilter {
                         index = columns-1;
                     else
                         index = x-offset+j;
-                    newValue += ComputePixelIntensity(input.getRGB(index, y))*filter[j];
+                    newValue += ((!edges)?ComputePixelIntensity(input.getRGB(index, y)):input.getRGB(index, y)&0xffffff)*filter[j];
                 }
                 //If if thresholding is disabled or new value exceeds threshold, update the output image.
                 if(!enableThreshold || (enableThreshold && newValue > threshold))
@@ -77,8 +77,11 @@ public class Filter2DSeperableConvolution extends ImageFilter {
         return output;
     }
 
+
+
     protected BufferedImage ConvolveColumns(BufferedImage input, float[] filter, boolean edges)
     {
+
         BufferedImage output = new BufferedImage(input.getWidth(), input.getHeight(), input.getType());
         int offset = filter.length/2;
         int columns = input.getWidth();
@@ -99,7 +102,7 @@ public class Filter2DSeperableConvolution extends ImageFilter {
                         index = rows-1;
                     else
                         index = y-offset+j;
-                    newValue += ComputePixelIntensity(input.getRGB(x, index))*filter[j];
+                    newValue += ((!edges)?ComputePixelIntensity(input.getRGB(x, index)):(input.getRGB(x, index))&0xffffff)*filter[j];
                 }
                 if(!edges)
                     output.setRGB(x,y,CalcNewPix(newValue));

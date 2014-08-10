@@ -13,6 +13,7 @@ public abstract class ImageFilter {
     public float ComputePixelIntensity(int pixel)
     {
         float pix = ((pixel>>16&0xff) + (pixel >>8&0xff) + (pixel&0xff))/3.0f;
+//        float pix = pixel&0xff;float pix = pixel&0xff;
         return pix;
     }
 

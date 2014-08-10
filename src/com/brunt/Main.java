@@ -1,10 +1,11 @@
 package com.brunt;
 
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
-import com.brunt.ImageProcessing.Filters.SobelFilter;
+import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
 import com.brunt.ImageProcessing.ImageManager;
 import com.brunt.Viewer.Window;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Scanner;
 
@@ -18,12 +19,18 @@ public class Main {
         BufferedImage originalImage = ImageManager.ReadImage(args[0]);
 
         //Run a Gaussian Filter with a threshold
-        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2, 30);
+        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2,80);
         BufferedImage gFilteredImage = gaussian.FilterImage(originalImage);
 
-        SobelFilter sobel = new SobelFilter();
+        SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = sobel.FilterImage(gFilteredImage);
 
+        int test = gFilteredImage.getRGB(180,20)&0xffffff;
+        for ( int i=31; i>=0; i--)
+        {
+            System.out.print(test>>i & 1);
+        }
+        System.out.println("\n"+new Color(test)+" "+ test);
         //create window
         Window displayBox = new Window(imageName);
 
