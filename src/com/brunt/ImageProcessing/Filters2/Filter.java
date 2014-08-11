@@ -78,18 +78,6 @@ public abstract class Filter {
 //        }
 //    }
 
-    protected int[] filter2DSeperableConvolution(int[] inputArr, int width, int height, float[] filterX, float[] filterY)
-    {
-        int[] outputArr = new int[width*height];
-        //Filter by row
-        outputArr = filter1DConvolution(inputArr,width,height,filterX);
-
-        //Transpose and filter by row (effectively filtering columns
-        transposeArr(outputArr, outputArr,width,height);
-        outputArr = filter1DConvolution(inputArr,height,width,filterY);
-        return outputArr;
-    }
-
     /**
      * transposeArr will output a transposed array to outputArr if the argument is passed
      * @param width
@@ -114,4 +102,18 @@ public abstract class Filter {
             }
         }
     }
+
+    protected int[] filter2DSeperableConvolution(int[] inputArr, int width, int height, float[] filterX, float[] filterY)
+    {
+        int[] outputArr = new int[width*height];
+        //Filter by row
+        outputArr = filter1DConvolution(inputArr,width,height,filterX);
+
+        //Transpose and filter by row (effectively filtering columns
+        transposeArr(outputArr, outputArr,width,height);
+        outputArr = filter1DConvolution(inputArr,height,width,filterY);
+        return outputArr;
+    }
+
+
 }

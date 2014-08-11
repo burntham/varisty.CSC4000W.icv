@@ -61,7 +61,7 @@ public class Utils {
 
         return newBuffImage;
     }
-
+//FILTERS2 Utils///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Return a GreyScal Version of the array
      * @param inputArr

@@ -4,6 +4,7 @@ import com.brunt.ImageProcessing.Discs;
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
 import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
 import com.brunt.ImageProcessing.Filters2.GaussianFilter2;
+import com.brunt.ImageProcessing.Filters2.SobelFilter2;
 import com.brunt.ImageProcessing.HoughTransform;
 import com.brunt.ImageProcessing.ImageManager;
 import com.brunt.ImageProcessing.Utils;
@@ -35,13 +36,23 @@ public class Main {
         BufferedImage gFilteredImage = Utils.convertIntArrToBufferedImage(gaussian.FilterImage(originalImage));
         displayBox.AddImage(gFilteredImage);
 
-        int[] test = Utils.createIntArrayFromImg(originalImage);
 
-       // Test new Gaussian Filter
+
+
+
+       // Test new Gaussian2 Filter
+
         GaussianFilter2 newG = new GaussianFilter2(1.4f,2);
         int[] gaussed = newG.filterImage(Utils.createIntArrayFromImg(originalImage),originalImage.getWidth(),originalImage.getHeight());
         BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
         displayBox.AddImage(newGaussed);
+
+        //Test New Sobel 2 Filter
+        SobelFilter2 newS = new SobelFilter2();
+        int[] sobelled = newS.filterImage(Utils.createIntArrayFromImg(originalImage),originalImage.getWidth(), originalImage.getHeight());
+        BufferedImage newSobelled = Utils.getGreyScaleBufferedImage(sobelled,originalImage.getWidth(),originalImage.getHeight());
+        displayBox.AddImage(newSobelled);
+
 
         SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
