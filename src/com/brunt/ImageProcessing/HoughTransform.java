@@ -170,8 +170,8 @@ public class HoughTransform {
             {
                 for ( int ran= 0; ran<differentRadii; ran++)
                 {
-                    float normalizer = (1.0f/(approximateIntercepts(ran+radMin)));
-                    temp[y][x] = Math.min(255,Math.max(temp[y][x],temp[y][x] + ((int)(accumulator[ran][y][x]*normalizer))));
+                    float normalizer = (1.0f/(approximateIntercepts(ran+radMin)*4));
+                    temp[y][x] = Math.min(255,Math.max(0,temp[y][x]+(int)(accumulator[ran][y][x]*normalizer*255)));// Math.min(255,Math.max(temp[y][x],temp[y][x] + ((int)(accumulator[ran][y][x]*normalizer))));
                 }
             }
         }
