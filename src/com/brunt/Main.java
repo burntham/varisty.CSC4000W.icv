@@ -37,16 +37,16 @@ public class Main {
 
 
         //Test new Gaussian Filter
-        GaussianFilter2 newG = new GaussianFilter2(originalImage,1.4f,2);
-        int[] gaussed = newG.filterImage(null);
-        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
-        displayBox.AddImage(newGaussed);
+//        GaussianFilter2 newG = new GaussianFilter2(originalImage,1.4f,2);
+//        int[] gaussed = newG.filterImage(null);
+//        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
+//        displayBox.AddImage(newGaussed);
 
         SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
         displayBox.AddImage(sobelOperatedImage);
 
-        int[] range={5,30};
+        int[] range={5,60};
         HoughTransform hough = new HoughTransform(originalImage,range,1.4f,2,0);
         LinkedList<Discs> DiscList = hough.detectDiscs();
         BufferedImage houghTest = hough.drawAccumulator();

@@ -8,47 +8,12 @@ import java.awt.image.BufferedImage;
  * Created by Daniel on 8/11/2014.
  */
 public abstract class Filter {
-    protected int[] originalImage;
-    protected int[] filteredImage;
-    protected int originalWidth, originalHeight;
-
-    public Filter()
-    {
-
-    }
-
-    public Filter(BufferedImage original)
-    {
-        originalImage = Utils.createIntArrayFromImg(original);
-    }
-
-    public Filter(int[] original, int width, int height)
-    {
-        this.originalImage = original;
-        this.originalHeight = height;
-        this.originalWidth = width;
-    }
 
     /**
      * Set call filterImage to create a new filtererd int[] dataset,
      * @return
      */
-    public abstract int[] filterImage(int[] original);
-
-//    /**
-//     * Return the filtered image, will return previously data if it exists or it will call methods to create filtered data
-//     * @return
-//     */
-//    public int[] getFilteredData()
-//    {
-//        if(filteredImage==null)
-//            filteredImage = filterImage();
-//
-//        return filteredImage;
-//    }
-
-
-
+    public abstract int[] filterImage(int[] original, int width, int height);
 
     protected int[] filter1DConvolution(int[] input,int width,int height, float[] filter)
     {
@@ -79,7 +44,4 @@ public abstract class Filter {
         }
         return filtered;
     }
-
-
-
 }
