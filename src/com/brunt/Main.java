@@ -3,6 +3,7 @@ package com.brunt;
 import com.brunt.ImageProcessing.Discs;
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
 import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
+import com.brunt.ImageProcessing.Filters2.GaussianFilter2;
 import com.brunt.ImageProcessing.HoughTransform;
 import com.brunt.ImageProcessing.ImageManager;
 import com.brunt.ImageProcessing.Utils;
@@ -21,20 +22,35 @@ public class Main {
         Scanner input = new Scanner(System.in);
         String imageName = (args.length>0)? args[0] : input.nextLine();
 
+        //create window
+        Window displayBox = new Window(imageName);
+
         //Load the original Image
         BufferedImage originalImage = ImageManager.ReadImage(args[0]);
+        displayBox.AddImage(originalImage);
+
 
         //Run a Gaussian Filter with a threshold
         GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2,30);
         BufferedImage gFilteredImage = Utils.convertIntArrToBufferedImage(gaussian.FilterImage(originalImage));
+        displayBox.AddImage(gFilteredImage);
+
+
+        //Test new Gaussian Filter
+        GaussianFilter2 newG = new GaussianFilter2(originalImage,1.4f,2);
+        int[] gaussed = newG.filterImage(null);
+        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
+        displayBox.AddImage(newGaussed);
 
         SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
+        displayBox.AddImage(sobelOperatedImage);
 
         int[] range={5,30};
         HoughTransform hough = new HoughTransform(originalImage,range,1.4f,2,0);
         LinkedList<Discs> DiscList = hough.detectDiscs();
         BufferedImage houghTest = hough.drawAccumulator();
+        displayBox.AddImage(houghTest);
 
         BufferedImage detected = new BufferedImage(originalImage.getWidth(),originalImage.getHeight(),BufferedImage.TYPE_INT_RGB);
         Graphics2D gDet = detected.createGraphics();
@@ -50,20 +66,19 @@ public class Main {
             gDet.drawOval(x-radius,y-radius,diameter,diameter);
         }
         gDet.dispose();
+        displayBox.AddImage(detected);
+
+
         String.format("%d Discs discovered",DiscList.size());
         System.out.println(String.format("%d Discs discovered",DiscList.size()));
 
-        //create window
-        Window displayBox = new Window(imageName);
 
-        //Add images to window Pane
-        displayBox.AddImage(originalImage);
-        displayBox.AddImage(gFilteredImage);
-        displayBox.AddImage(sobelOperatedImage);
-        displayBox.AddImage(houghTest);
-        displayBox.AddImage(detected);
 
-        //display window
+
+
+
+
+
         displayBox.ShowWindow();
 
         if (originalImage == null)

@@ -15,9 +15,9 @@ public class GaussianFilterConvolution extends Filter2DSeperableConvolution {
         }
 
         public double GaussIT(int x)
-        {
-            return ((1.0)/Math.sqrt(2*Math.PI*Math.pow(sigma,2)))*Math.exp(-(Math.pow(x,2)/(2*Math.pow(sigma,2))));
-        }
+    {
+        return ((1.0)/Math.sqrt(2*Math.PI*Math.pow(sigma,2)))*Math.exp(-(Math.pow(x,2)/(2*Math.pow(sigma,2))));
+    }
     }
 
     private GaussianFunc G;

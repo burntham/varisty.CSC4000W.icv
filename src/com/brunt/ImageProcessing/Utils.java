@@ -89,4 +89,66 @@ public class Utils {
         return outputArr;
     }
 
+    /**
+     * Return a GreyScal Version of the array
+     * @param inputArr
+     * @param width
+     * @param height
+     * @return
+     */
+    public static BufferedImage getGreyScaleBufferedImage(int[] inputArr, int width, int height)
+    {
+        BufferedImage newImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+
+        for (int y=0; y<height; y++)
+        {
+            for ( int x = 0; x< width;x ++)
+            {
+                newImage.setRGB(x,y,getGreyValue(inputArr[y*height+x]));
+            }
+        }
+        return newImage;
+    }
+
+    /**
+     * Calculate the GreyScaleValue
+     * @param pix
+     * @return
+     */
+    public static int getGreyValue(int pix)
+    {
+        return (int)(Math.min(255, ((pix>>16&0xff)+(pix>>8&0xff)+(pix&0xff))/3.0f));
+    }
+
+    /**
+     * Gaussian Function
+     * @param x
+     * @param sigma
+     * @return
+     */
+    public static double getGaussian(int x, float sigma)
+    {
+        return ((1.0)/Math.sqrt(2*Math.PI*Math.pow(sigma,2)))*Math.exp(-(Math.pow(x,2)/(2*Math.pow(sigma,2))));
+    }
+
+
+    /**
+     * Convert Buffered image into an int array
+     * @param original
+     * @return
+     */
+    public static int[] createIntArrayFromImg(BufferedImage original)
+    {
+        int height = original.getHeight(), width = original.getWidth();
+        int[] newArr = new int[height*width];
+        for (int y=0; y<height;y++)
+        {
+            for (int x=0; x<width;x++)
+            {
+                newArr[y*width+x] = original.getRGB(x,y) &0xffffff;
+            }
+        }
+        return newArr;
+    }
+
 }

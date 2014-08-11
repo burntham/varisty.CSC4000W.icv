@@ -1,5 +1,7 @@
 package com.brunt.ImageProcessing.Filters2;
 
+import com.brunt.ImageProcessing.Utils;
+
 import java.awt.image.BufferedImage;
 
 /**
@@ -10,9 +12,14 @@ public abstract class Filter {
     protected int[] filteredImage;
     protected int originalWidth, originalHeight;
 
-    Filter(BufferedImage original)
+    public Filter()
     {
-        originalImage = createIntArrayFromImg(original);
+
+    }
+
+    public Filter(BufferedImage original)
+    {
+        originalImage = Utils.createIntArrayFromImg(original);
     }
 
     public Filter(int[] original, int width, int height)
@@ -26,77 +33,50 @@ public abstract class Filter {
      * Set call filterImage to create a new filtererd int[] dataset,
      * @return
      */
-public abstract int[] filterImage();
+    public abstract int[] filterImage(int[] original);
 
-    /**
-     * Return a GreyScal Version of the array
-     * @param inputArr
-     * @param width
-     * @param height
-     * @return
-     */
-    public BufferedImage getGreyScaleBufferedImage(int[] inputArr, int width, int height)
+//    /**
+//     * Return the filtered image, will return previously data if it exists or it will call methods to create filtered data
+//     * @return
+//     */
+//    public int[] getFilteredData()
+//    {
+//        if(filteredImage==null)
+//            filteredImage = filterImage();
+//
+//        return filteredImage;
+//    }
+
+
+
+
+    protected int[] filter1DConvolution(int[] input,int width,int height, float[] filter)
     {
-        BufferedImage newImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+        int[] filtered = new int[width*height];
+        int offset = filter.length/2;
+        int columns = width;
+        int rows = height;
 
-        for (int y=0; y<height; y++)
+        for ( int y = 0; y<rows; y++)
         {
-            for ( int x = 0; x< width;x ++)
+            for (int x = 0; x <columns; x++)
             {
-                newImage.setRGB(x,y,getGreyValue(inputArr[y*height+x]));
+                float newValue = 0.0f;
+
+                for ( int j =0; j<filter.length;j++)
+                {
+                    int index=0;
+                    if ( x- offset+j <0)
+                        index=0;
+                    else if(x-offset+j>=columns)
+                        index = columns-1;
+                    else
+                        index = x-offset+j;
+                    newValue += input[y*width+index]*filter[j];
+                }
+                filtered[y*height+x] = (int)newValue;
             }
         }
-        return newImage;
-    }
-
-    /**
-     * Return the filtered image, will return previously data if it exists or it will call methods to create filtered data
-     * @return
-     */
-    public int[] getFilteredData()
-    {
-        if(filteredImage==null)
-            filteredImage = filterImage();
-
-        return filteredImage;
-    }
-
-    /**
-     * Calculate the GreyScaleValue
-     * @param pix
-     * @return
-     */
-    private int getGreyValue(int pix)
-    {
-        return (int)(Math.min(255, ((pix>>16&0xff)+(pix>>8&0xff)+(pix&0xff))/3.0f));
-    }
-
-    /**
-     * Convert Buffered image into an int array
-     * @param original
-     * @return
-     */
-    private int[] createIntArrayFromImg(BufferedImage original)
-    {
-        originalHeight = original.getHeight();
-        originalHeight = original.getWidth();
-        int[] newArr = new int[originalHeight*originalWidth];
-        for (int y=0; y<originalHeight;y++)
-        {
-            for (int x=0; x<originalWidth;x++)
-            {
-                newArr[y*originalWidth+x] = original.getRGB(x,y) &0xffffff;
-            }
-        }
-        return newArr;
-    }
-
-    protected int[] filter1DConvolution(int[] filter)
-    {
-        int[] filtered = new int[originalHeight*originalWidth];
-
-
-        filteredImage=filtered;
         return filtered;
     }
 
