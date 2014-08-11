@@ -63,27 +63,6 @@ public class Utils {
     }
 
     /**
-     * transposeArr will output a transposed array to outputArr if the argument is passed
-     * @param width
-     * @param height
-     * @param inputArr
-     * @return
-     */
-    public static int[] transposeArr(int width, int height, int[] inputArr)
-    {
-        int[] outputArr = new int[inputArr.length];
-
-        for ( int y=0;y<height;y++)
-        {
-            for (int x=0;x<width;x++)
-            {
-                    outputArr[x*height+y] = inputArr[y*width+x];
-            }
-        }
-        return outputArr;
-    }
-
-    /**
      * Return a GreyScal Version of the array
      * @param inputArr
      * @param width

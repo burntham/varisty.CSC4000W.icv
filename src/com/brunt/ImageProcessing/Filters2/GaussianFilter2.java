@@ -38,11 +38,13 @@ public class GaussianFilter2 extends Filter {
 
     @Override
     public int[] filterImage(int[] original, int width, int height) {
-        int[] filtered= filter1DConvolution(original,width,height,gFilter);
-        int[] filteredTrans = Utils.transposeArr(width,height,filtered);
-        int[] columnFiltered = filter1DConvolution(filteredTrans,height,width,gFilter);
-        int[] filteredUnTrans =Utils.transposeArr(height,width,columnFiltered);
-        return filteredUnTrans;
+//        int[] filtered= filter1DConvolution(original,width,height,gFilter);
+//        filtered = Utils.transposeArr(width,height,filtered);
+//        filtered = filter1DConvolution(filtered,height,width,gFilter);
+//        filtered = Utils.transposeArr(height,width,filtered);
+//        return filtered;
+        int [] filtered = filter2DSeperableConvolution(original,width,height, gFilter, gFilter);
+        return filtered;
     }
 
 
