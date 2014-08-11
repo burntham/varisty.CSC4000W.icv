@@ -20,7 +20,8 @@ public class HoughTransform {
         this.inputImage=inputImage;
         radMin = radiusRange[0];
         radMax=radiusRange[1];
-        //Load Guassian FIlters etc independantly, until Canny detection implemented
+
+        //Load Guassian FIlters etc independantly, until Canny detection implemented properly...
         if(threshold>0)
             gaussianFilter = new GaussianFilterConvolution(gaussianSigma, gaussianRadius,threshold);
         else
@@ -42,15 +43,14 @@ public class HoughTransform {
             {
                 if(edgeDetected[y][x]!=0)
                 {
-                    System.out.print(x&0xff);
+                    //System.out.print(x);
                     for (int rad = radMin; rad<radMax; rad++)
                     {
                         bresCircle(x,y,rad);
                     }
                 }
-
             }
-            System.out.println();;
+            //System.out.println();;
         }
     }
 

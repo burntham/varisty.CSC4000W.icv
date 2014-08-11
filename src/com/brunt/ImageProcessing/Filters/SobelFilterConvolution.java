@@ -114,13 +114,11 @@ public class SobelFilterConvolution extends Filter2DSeperableConvolution {
             }
             if (max >= newMax)
             {
-                newSuppressed[y][x] = 255;
+                newSuppressed[y][x] = max;
                 edges.add(new Point(x,y));
             }
             else
                 newSuppressed[y][x]=0;
-
-
         }
         return newSuppressed;
     }

@@ -27,8 +27,8 @@ public class Main {
         SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
 
-        int[] range={15,32};
-        HoughTransform hough = new HoughTransform(originalImage,range,1.4f,1,30);
+        int[] range={30,32};
+        HoughTransform hough = new HoughTransform(originalImage,range,1.4f,2,30);
         hough.detectDiscs();
         BufferedImage houghTest = hough.drawAccumulator();
         //create window

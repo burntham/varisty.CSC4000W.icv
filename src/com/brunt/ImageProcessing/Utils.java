@@ -49,11 +49,13 @@ public class Utils {
         int height=original.length, width = original[0].length;
         BufferedImage newBuffImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 
+
         for ( int y=0; y<height;y++)
         {
             for (int x=0; x<width;x++)
             {
-                newBuffImage.setRGB(x,y,original[y][x]);
+                int newPix = original[y][x];
+                newBuffImage.setRGB(x,y,newPix<<16 | newPix<<8 | newPix);
             }
         }
 
