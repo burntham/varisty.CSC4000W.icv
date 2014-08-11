@@ -6,13 +6,14 @@ import java.awt.*;
  * Created by Daniel on 8/10/2014.
  */
 public class Discs extends Point {
-    private int radius;
+    public final int radius;
 
     Discs(int x, int y, int radius)
     {
         super(x,y);
         this.radius = radius;
     }
+
 
 
 

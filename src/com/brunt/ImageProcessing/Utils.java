@@ -55,6 +55,7 @@ public class Utils {
             for (int x=0; x<width;x++)
             {
                 int newPix = original[y][x];
+                newPix = (newPix>255)?255:newPix;
                 newBuffImage.setRGB(x,y,newPix<<16 | newPix<<8 | newPix);
             }
         }
