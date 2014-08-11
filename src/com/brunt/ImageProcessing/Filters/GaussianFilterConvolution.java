@@ -31,6 +31,7 @@ public class GaussianFilterConvolution extends Filter2DSeperableConvolution {
     public GaussianFilterConvolution(float sigma, int radius, int threshold) {
         super(threshold);
         initFilter(sigma,radius);
+
     }
 
     private void initFilter(float sigma, int radius)

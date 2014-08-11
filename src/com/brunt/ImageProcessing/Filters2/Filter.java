@@ -37,9 +37,9 @@ public abstract class Filter {
                         index = columns-1;
                     else
                         index = x-offset+j;
-                    newValue += input[y*width+index]*filter[j];
+                    newValue += (int)input[y*width+index]*filter[j];
                 }
-                filtered[y*height+x] = (int)newValue;
+                filtered[y*width+x] = (int)newValue;
             }
         }
         return filtered;

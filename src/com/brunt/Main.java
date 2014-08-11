@@ -31,16 +31,17 @@ public class Main {
 
 
         //Run a Gaussian Filter with a threshold
-        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2,30);
+        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2);
         BufferedImage gFilteredImage = Utils.convertIntArrToBufferedImage(gaussian.FilterImage(originalImage));
         displayBox.AddImage(gFilteredImage);
 
+        int[] test = Utils.createIntArrayFromImg(originalImage);
 
-        //Test new Gaussian Filter
-//        GaussianFilter2 newG = new GaussianFilter2(originalImage,1.4f,2);
-//        int[] gaussed = newG.filterImage(null);
-//        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
-//        displayBox.AddImage(newGaussed);
+       // Test new Gaussian Filter
+        GaussianFilter2 newG = new GaussianFilter2(1.4f,2);
+        int[] gaussed = newG.filterImage(Utils.createIntArrayFromImg(originalImage),originalImage.getWidth(),originalImage.getHeight());
+        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
+        displayBox.AddImage(newGaussed);
 
         SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));

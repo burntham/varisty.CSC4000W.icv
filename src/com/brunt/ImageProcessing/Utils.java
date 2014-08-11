@@ -67,23 +67,17 @@ public class Utils {
      * @param width
      * @param height
      * @param inputArr
-     * @param outputArr The array the transpose will be output to, if left null the function will return a copy of the transposed array, instead of modifying the original
      * @return
      */
-    public static int[] transposeArr(int width, int height, int[] inputArr, int[] outputArr)
+    public static int[] transposeArr(int width, int height, int[] inputArr)
     {
+        int[] outputArr = new int[inputArr.length];
+
         for ( int y=0;y<height;y++)
         {
             for (int x=0;x<width;x++)
             {
-                if (outputArr==null)
-                {
-                    int temp = inputArr[y*width+x];
-                    inputArr[y*width+x] = inputArr[x*height+y];
-                    inputArr[x*height+y] = temp;
-                }
-                else
-                    outputArr[x*height+y] = inputArr[y*height+x];
+                    outputArr[x*height+y] = inputArr[y*width+x];
             }
         }
         return outputArr;
@@ -104,7 +98,7 @@ public class Utils {
         {
             for ( int x = 0; x< width;x ++)
             {
-                newImage.setRGB(x,y,getGreyValue(inputArr[y*height+x]));
+                newImage.setRGB(x,y,setGreyIntensity(inputArr[y*width+x]));
             }
         }
         return newImage;
@@ -115,9 +109,14 @@ public class Utils {
      * @param pix
      * @return
      */
-    public static int getGreyValue(int pix)
+    public static int getPixelAvgIntensity(int pix)
     {
-        return (int)(Math.min(255, ((pix>>16&0xff)+(pix>>8&0xff)+(pix&0xff))/3.0f));
+        return (int)(((pix>>16&0xff)+(pix>>8&0xff)+(pix&0xff))/3.0f);
+    }
+
+    public static int setGreyIntensity(int pix)
+    {
+        return (int)((((pix&0xff)<<16) | ((pix&0xff)<<8) | (pix&0xff)));
     }
 
     /**
@@ -145,7 +144,7 @@ public class Utils {
         {
             for (int x=0; x<width;x++)
             {
-                newArr[y*width+x] = original.getRGB(x,y) &0xffffff;
+                newArr[y*width+x] = Utils.getPixelAvgIntensity(original.getRGB(x,y));
             }
         }
         return newArr;

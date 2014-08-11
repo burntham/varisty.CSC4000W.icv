@@ -12,40 +12,37 @@ public class GaussianFilter2 extends Filter {
     //The actual Filter
     private float[] gFilter;
 
-//    public GaussianFilter2(float sigma, int radius) {
-//        this.gFilter = initFilter(sigma,radius);
-//    }
-//
-//    public GaussianFilter2(BufferedImage original, float sigma, int radius) {
-//        super(original);
-//        this.gFilter = initFilter(sigma,radius);
-//    }
-//
-//    public GaussianFilter2(int[] original, int width, int height, float sigma, int radius) {
-//        super(original, width, height);
-//        this.gFilter = initFilter(sigma,radius);
-//    }
+    public GaussianFilter2(float sigma, int radius) {
+        this.gFilter = initFilter(sigma,radius);
+        float sum=0;
+        for (int i=0; i<gFilter.length;i++)
+        {
+            sum+=gFilter[i];
+            System.out.print(gFilter[i]+" ");
+        }
+        System.out.println("\n"+sum);
+
+    }
 
     private float[] initFilter( float sigma, int radius)
     {
-        float[] newFilter = new float[radius*2-1];
-        for (int i=0;i<2*radius-1;i++)
+        float[] newFilter = new float[radius*2+1];
+        for (int i=0;i<=2*radius;i++)
         {
             newFilter[i] = (float)Utils.getGaussian(i-radius,sigma);
         }
+
+
         return newFilter;
     }
 
     @Override
     public int[] filterImage(int[] original, int width, int height) {
-
-
         int[] filtered= filter1DConvolution(original,width,height,gFilter);
-        Utils.transposeArr(width,height,filtered,null);
-        int[] columnFiltered = filter1DConvolution(filtered,height,width,gFilter);
-        Utils.transposeArr(height,width,filtered,null);
-        System.out.println(filtered.length);
-        return filtered;
+        int[] filteredTrans = Utils.transposeArr(width,height,filtered);
+        int[] columnFiltered = filter1DConvolution(filteredTrans,height,width,gFilter);
+        int[] filteredUnTrans =Utils.transposeArr(height,width,columnFiltered);
+        return filteredUnTrans;
     }
 
 
