@@ -73,7 +73,7 @@ public class HoughTransform {
         LinkedList<Discs> discList = new LinkedList<Discs>();
         for (int radius =radMin; radius < radMax; radius++)
         {
-            int approxIntecepts = (int)(approximateIntercepts(radius)*0.7f);
+            int approxIntecepts = (int)(approximateIntercepts(radius)*0.6f);
             for ( int y=0; y<imageHeight;y++)
             {
                 for ( int x=0; x<imageWidth;x++)
@@ -170,8 +170,8 @@ public class HoughTransform {
             {
                 for ( int ran= 0; ran<differentRadii; ran++)
                 {
-                    float normalizer = (1.0f/approximateIntercepts(ran+radMin));
-                    temp[y][x] += (accumulator[ran][y][x]*normalizer)*255;
+                    float normalizer = (1.0f/(approximateIntercepts(ran+radMin)));
+                    temp[y][x] = Math.min(255,Math.max(temp[y][x],temp[y][x] + ((int)(accumulator[ran][y][x]*normalizer))));
                 }
             }
         }

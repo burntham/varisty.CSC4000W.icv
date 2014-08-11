@@ -25,14 +25,14 @@ public class Main {
         BufferedImage originalImage = ImageManager.ReadImage(args[0]);
 
         //Run a Gaussian Filter with a threshold
-        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,1, 30);
+        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,3,30);
         BufferedImage gFilteredImage = Utils.convertIntArrToBufferedImage(gaussian.FilterImage(originalImage));
 
         SobelFilterConvolution sobel = new SobelFilterConvolution();
         BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
 
-        int[] range={10,40};
-        HoughTransform hough = new HoughTransform(originalImage,range,1.4f,2,30);
+        int[] range={15,30};
+        HoughTransform hough = new HoughTransform(originalImage,range,1.4f,3,30);
         LinkedList<Discs> DiscList = hough.detectDiscs();
         BufferedImage houghTest = hough.drawAccumulator();
 
