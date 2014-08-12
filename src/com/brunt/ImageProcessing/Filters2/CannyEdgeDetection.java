@@ -27,14 +27,10 @@ public class CannyEdgeDetection {
 
     public int[] detectEdges(int[] original, int width, int height)
     {
-        LinkedList<Edge> edges = new LinkedList<Edge>();
-
         int[] gaussedImage=gaussFilter.filterImage(original,width,height);
         int[] sobeledGaussed = sobelFilter.filterImage(gaussedImage,width,height);
         LinkedList<Theta> gradientThetas = sobelFilter.getGradientAngles();
         int[] suppressedSobel = nonMaximSupression(sobeledGaussed, width, height, gradientThetas);
-
-
         return suppressedSobel;
     }
 

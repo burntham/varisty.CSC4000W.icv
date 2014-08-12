@@ -29,8 +29,9 @@ public class SobelFilter2 extends Filter {
         {
                 int y=(i/width);
                 int x=i-y*width;
-                gMag[i] = (int) Math.sqrt(Math.pow(gX[i], 2) + Math.pow(gY[i], 2));
-            if(gMag[i]>0)
+                double mag = Math.sqrt(Math.pow(gX[i], 2) + Math.pow(gY[i], 2));
+                gMag[i] = (int) mag;
+            if(mag>0)
                 gradientAngles.add(new Theta((x),(y),gX[i],gY[i]));
         }
         return gMag;

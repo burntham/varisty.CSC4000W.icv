@@ -1,5 +1,3 @@
-package com.brunt;
-
 import com.brunt.ImageProcessing.*;
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
 import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
@@ -89,12 +87,13 @@ public class Main {
         LinkedList<Discs> detectedDiscs= houghTransform.detectDiscs(original,width,height,minCircleRadius,maxCircleRadius,sigma,gausRadius);
 
 
+        //Generate an image with the features highlighted
         BufferedImage detected = new BufferedImage(originalImage.getWidth(),originalImage.getHeight(),BufferedImage.TYPE_INT_RGB);
         Graphics2D gDet = detected.createGraphics();
         gDet.drawImage(originalImage,null,null);
         gDet.setColor(Color.red);
         Iterator<Discs> discIterator = detectedDiscs.iterator();
-        System.out.println(String.format("%d discs detected:",detectedDiscs.size()));
+        System.out.println(String.format("%d discs detected",detectedDiscs.size()));
         while(discIterator.hasNext())
         {
             Discs testDisc = discIterator.next();
