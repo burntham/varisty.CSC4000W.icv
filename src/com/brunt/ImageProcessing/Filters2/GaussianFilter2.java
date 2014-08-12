@@ -18,9 +18,7 @@ public class GaussianFilter2 extends Filter {
         for (int i=0; i<gFilter.length;i++)
         {
             sum+=gFilter[i];
-            System.out.print(gFilter[i]+" ");
         }
-        System.out.println("\n"+sum);
 
     }
 

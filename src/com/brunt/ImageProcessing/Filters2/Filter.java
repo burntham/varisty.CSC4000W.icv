@@ -85,35 +85,36 @@ public abstract class Filter {
      * @param inputArr
      * @param outputArr
      */
-    private void transposeArr(int[] inputArr, int[] outputArr, int width, int height )
+    private int[] transposeArr(int[] inputArr, int width, int height )
     {
+        int[] outputArr = new int[width*height];
         for ( int y=0;y<height;y++)
         {
             for (int x=0;x<width;x++)
             {
-                if(inputArr!=outputArr)
-                    outputArr[x*height+y] = inputArr[y*width+x];
-                else
-                {
-                    int temp = inputArr[y*width+x];
-                    inputArr[y*width+x]=outputArr[x*height+y];
-                    inputArr[y*width+x]= outputArr[x*height+y];
-                }
+             outputArr[x*height+y] = inputArr[y*width+x];
             }
         }
+        return outputArr;
     }
 
     protected int[] filter2DSeperableConvolution(int[] inputArr, int width, int height, float[] filterX, float[] filterY)
     {
-        int[] outputArr = new int[width*height];
-        //Filter by row
-        outputArr = filter1DConvolution(inputArr,width,height,filterX);
+        int[] firstFilter= filter1DConvolution(inputArr,width,height,filterX);
+        int[] transposed =transposeArr(firstFilter,width,height);
 
-        //Transpose and filter by row (effectively filtering columns
-        transposeArr(outputArr, outputArr,width,height);
-        outputArr = filter1DConvolution(inputArr,height,width,filterY);
-        return outputArr;
+//        Transpose and filter by row (effectively filtering columns
+        int[] secondFilter = filter1DConvolution(transposed,height,width,filterY);
+        int[] transposed2 = transposeArr(secondFilter,height,width);
+
+        return transposed2;
     }
 
+    private void printTest(int[] arr)
+    {
+        for (int i=0;i<arr.length;i++)
+            System.out.print(" "+arr[i]);
+        System.out.println();
+    }
 
 }

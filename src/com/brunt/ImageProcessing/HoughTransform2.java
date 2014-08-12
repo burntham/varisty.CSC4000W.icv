@@ -1,44 +1,45 @@
 package com.brunt.ImageProcessing;
 
-import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
-import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
 import com.brunt.ImageProcessing.Filters2.CannyEdgeDetection;
 import com.brunt.ImageProcessing.Filters2.GaussianFilter2;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 /**
  * Created by Daniel on 8/10/2014.
  */
-public class HoughTransform {
+public class HoughTransform2 {
     private int[][][] accumulator;
-    private int radMin, radMax, differentRadii;
+    private int minRadius, maxRadius;
     private GaussianFilter2 gaussianFilter;
     private CannyEdgeDetection cannyDetector;
-    private BufferedImage inputImage;
     private int imageWidth, imageHeight;
 
-    public HoughTransform(BufferedImage inputImage, int[] radiusRange, float gaussianSigma,int gaussianRadius, int threshold){
-        this.inputImage=inputImage;
-        radMin = radiusRange[0];
-        radMax=radiusRange[1];
-        differentRadii = radMax-radMin;
-
-        //Load Guassian FIlters etc independantly, until Canny detection implemented properly...
+    public HoughTransform2( int minRadius, int maxRadius, float gaussianSigma,int gaussianRadius){
+        this.minRadius = minRadius;
+        this.maxRadius=maxRadius;
 
         gaussianFilter = new GaussianFilter2(gaussianSigma,gaussianRadius);
         cannyDetector = new CannyEdgeDetection(5,10);
 
-        imageHeight = inputImage.getHeight();
-        imageWidth = inputImage.getWidth();
     }
 
-    public LinkedList<Discs> detectDiscs()
+    public LinkedList<Discs> detectDiscs(int[] original,int width,int height, int minRadius, int maxRadius, float sigma,int gaussRadius)
     {
-        accumulator = new int[differentRadii][imageHeight][imageWidth];
-        populateAcummulator();
+        this.minRadius = minRadius;
+        this.maxRadius=maxRadius;
+        this.imageHeight = height;
+        this.imageWidth = width;
+
+        int radiusRange = maxRadius-minRadius;
+        accumulator = new int[radiusRange][imageHeight][imageWidth];
+        int[] blurred = gaussianFilter.filterImage(original,width,height);
+        int[] edgeDetected = cannyDetector.detectEdges(blurred,width,height);
+        LinkedList<Point> edges = cannyDetector.getEdges();
+        populateAcummulator(edges);
         LinkedList<Discs> discList = exctractDiscsFromAcc();
 
         return discList;
@@ -47,29 +48,17 @@ public class HoughTransform {
     /**
      * Populate the accumulator
      */
-    private void populateAcummulator()
+    private void populateAcummulator(LinkedList<Point> edges)
     {
-        int[] edges = cannyDetector.detectEdges(Utils.createIntArrayFromImg(inputImage),imageWidth,imageHeight);
-        int[][] edgeDetected = new int[imageHeight][imageWidth];
+        ListIterator<Point> edgeIter=  edges.listIterator();
 
-        for (int i=0;i<imageHeight*imageWidth;i++)
+        while(edgeIter.hasNext())
         {
-            int y = i/imageWidth;
-            int x = i-y*imageWidth;
-            edgeDetected[y][x] = edges[i];
-        }
+            Point edge = edgeIter.next();
 
-        for ( int y=0; y<imageHeight;y++)
-        {
-            for ( int x=0; x<imageWidth; x++)
+            for (int rad = minRadius; rad<maxRadius; rad++)
             {
-                if(edgeDetected[y][x]!=0)
-                {
-                    for (int rad = radMin; rad<radMax; rad++)
-                    {
-                        bresCircle(x,y,rad);
-                    }
-                }
+                bresCircle(edge.x,edge.y,rad);
             }
         }
     }
@@ -81,14 +70,14 @@ public class HoughTransform {
     private LinkedList<Discs> exctractDiscsFromAcc()
     {
         LinkedList<Discs> discList = new LinkedList<Discs>();
-        for (int radius =radMin; radius < radMax; radius++)
+        for (int radius = minRadius; radius < maxRadius; radius++)
         {
-            int approxIntecepts = (int)(approximateIntercepts(radius)*0.6f);
+            int approxIntecepts = (int)(approximateIntercepts(radius)*0.5f);
             for ( int y=0; y<imageHeight;y++)
             {
                 for ( int x=0; x<imageWidth;x++)
                 {
-                    if(accumulator[radius-radMin][y][x]>approxIntecepts)
+                    if(accumulator[radius- minRadius][y][x]>=approxIntecepts)
                     {
                         discList.add(new Discs(x,y,radius));
                     }
@@ -106,20 +95,20 @@ public class HoughTransform {
      */
     private int approximateIntercepts(int radius)
     {
-            int x=0, y=radius , xCenter=0, yCenter=0, count=0;
-            int d = 3 -2*radius;
-            while(x<y) {
-                count += 8;
-                x = x + 1;
-                if (d < 0)
-                    d += 4 * x + 6;
-                else {
-                    y--;
-                    d += 4 * (x - y) + 10;
-                }
-                count += 8;
+        int x=0, y=radius , xCenter=0, yCenter=0, count=0;
+        int d = 3 -2*radius;
+        while(x<y) {
+            count += 8;
+            x = x + 1;
+            if (d < 0)
+                d += 4 * x + 6;
+            else {
+                y--;
+                d += 4 * (x - y) + 10;
             }
-            return count;
+            count += 8;
+        }
+        return count;
     }
 
     /**
@@ -164,27 +153,34 @@ public class HoughTransform {
     {
         if (x>=0 && x<imageWidth)
             if(y>=0 && y<imageHeight)
-                accumulator[radius-radMin][y][x] +=1;
+                accumulator[radius- minRadius][y][x] +=1;
     }
 
     public BufferedImage drawAccumulator()
     {
+        int radiusRange = maxRadius-minRadius;
+        int minIntercepts = approximateIntercepts(minRadius);
+        int maxIntercepts = approximateIntercepts(maxRadius);
+        int interceptRange = maxIntercepts-minIntercepts;
         if(accumulator==null)
             return null;
 
-        int[][] temp = new int[imageHeight][imageWidth];
+        int[] temp = new int[imageHeight*imageWidth];
 
-        for (int y=0;y<imageHeight;y++)
+        for ( int ran= 0; ran<radiusRange; ran++)
         {
-            for (int x=0; x<imageWidth;x++)
+            for (int y=0;y<imageHeight;y++)
             {
-                for ( int ran= 0; ran<differentRadii; ran++)
+                for (int x=0; x<imageWidth;x++)
                 {
-                    float normalizer = (1.0f/(approximateIntercepts(ran+radMin)*4));
-                    temp[y][x] = Math.min(255,Math.max(0,temp[y][x]+(int)(accumulator[ran][y][x]*normalizer*255)));// Math.min(255,Math.max(temp[y][x],temp[y][x] + ((int)(accumulator[ran][y][x]*normalizer))));
+                    float intercepts = Math.min(approximateIntercepts(accumulator[ran][y][x]),accumulator[ran][y][x]);
+                    float normaliZed = (intercepts-minIntercepts)/(interceptRange*1.0f);
+                    //float normalizer = //Math.min(1.0f,(accumulator[ran][y][x]*1.0f)/(approximateIntercepts(ran+minRadius)*50));
+                    //temp[y*imageWidth+x] = Math.min(255,Math.max(0,temp[y*imageWidth+x]+(int)((intercepts*(normaliZed*255)))));
+                    temp[y*imageWidth+x] += (intercepts*normaliZed)*255;
                 }
             }
         }
-        return Utils.convertIntArrToBufferedImage(temp);
+        return Utils.getGreyScaleBufferedImage(temp,imageWidth,imageHeight);
     }
 }

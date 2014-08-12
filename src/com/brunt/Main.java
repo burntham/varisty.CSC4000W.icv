@@ -1,13 +1,11 @@
 package com.brunt;
 
-import com.brunt.ImageProcessing.Discs;
+import com.brunt.ImageProcessing.*;
 import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
 import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
+import com.brunt.ImageProcessing.Filters2.CannyEdgeDetection;
 import com.brunt.ImageProcessing.Filters2.GaussianFilter2;
 import com.brunt.ImageProcessing.Filters2.SobelFilter2;
-import com.brunt.ImageProcessing.HoughTransform;
-import com.brunt.ImageProcessing.ImageManager;
-import com.brunt.ImageProcessing.Utils;
 import com.brunt.Viewer.Window;
 import com.sun.javafx.binding.StringFormatter;
 
@@ -29,46 +27,39 @@ public class Main {
         //Load the original Image
         BufferedImage originalImage = ImageManager.ReadImage(args[0]);
         displayBox.AddImage(originalImage);
-
-
-        //Run a Gaussian Filter with a threshold
-        GaussianFilterConvolution gaussian = new GaussianFilterConvolution(1.4f,2);
-        BufferedImage gFilteredImage = Utils.convertIntArrToBufferedImage(gaussian.FilterImage(originalImage));
-        displayBox.AddImage(gFilteredImage);
-
-
-
-
-
-       // Test new Gaussian2 Filter
+        int[] original = Utils.createIntArrayFromImg(originalImage);
+        int width = originalImage.getWidth(), height = originalImage.getHeight();
 
         GaussianFilter2 newG = new GaussianFilter2(1.4f,2);
-        int[] gaussed = newG.filterImage(Utils.createIntArrayFromImg(originalImage),originalImage.getWidth(),originalImage.getHeight());
-        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,originalImage.getWidth(),originalImage.getHeight());
+        int[] gaussed = newG.filterImage(original,originalImage.getWidth(),originalImage.getHeight());
+        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,width,height);
         displayBox.AddImage(newGaussed);
 
         //Test New Sobel 2 Filter
         SobelFilter2 newS = new SobelFilter2();
-        int[] sobelled = newS.filterImage(Utils.createIntArrayFromImg(originalImage),originalImage.getWidth(), originalImage.getHeight());
-        BufferedImage newSobelled = Utils.getGreyScaleBufferedImage(sobelled,originalImage.getWidth(),originalImage.getHeight());
+        int[] sobelled = newS.filterImage(gaussed,originalImage.getWidth(), originalImage.getHeight());
+        BufferedImage newSobelled = Utils.getGreyScaleBufferedImage(sobelled, originalImage.getWidth(), originalImage.getHeight());
         displayBox.AddImage(newSobelled);
 
+        //Test New CannyEdgeDetector
+        CannyEdgeDetection newCan = new CannyEdgeDetection(0,0);
+        int[] cannied = newCan.detectEdges(original,originalImage.getWidth(), originalImage.getHeight() );
+        BufferedImage newCannied = Utils.getRawColouredBufferedImage(cannied, originalImage.getWidth(), originalImage.getHeight());
+        displayBox.AddImage(newCannied);
 
-        SobelFilterConvolution sobel = new SobelFilterConvolution();
-        BufferedImage sobelOperatedImage = Utils.convertIntArrToBufferedImage(sobel.FilterImage(gFilteredImage));
-        displayBox.AddImage(sobelOperatedImage);
+        HoughTransform2 newHough = new HoughTransform2(14,60,1.4f,2);
+        LinkedList<Discs> newHoughDiscs = newHough.detectDiscs(original,width,height,14,16,1.4f,2);
+        System.out.println(String.format("%d discs found with new Hough", newHoughDiscs.size()));
+        BufferedImage newHoughSpace = newHough.drawAccumulator();
 
-        int[] range={5,60};
-        HoughTransform hough = new HoughTransform(originalImage,range,1.4f,2,0);
-        LinkedList<Discs> DiscList = hough.detectDiscs();
-        BufferedImage houghTest = hough.drawAccumulator();
-        displayBox.AddImage(houghTest);
+        displayBox.AddImage(newHoughSpace);
+
 
         BufferedImage detected = new BufferedImage(originalImage.getWidth(),originalImage.getHeight(),BufferedImage.TYPE_INT_RGB);
         Graphics2D gDet = detected.createGraphics();
         gDet.drawImage(originalImage,null,null);
         gDet.setColor(Color.red);
-        Iterator<Discs> discIterator = DiscList.iterator();
+        Iterator<Discs> discIterator = newHoughDiscs.iterator();
         while(discIterator.hasNext())
         {
             Discs testDisc = discIterator.next();
@@ -79,17 +70,6 @@ public class Main {
         }
         gDet.dispose();
         displayBox.AddImage(detected);
-
-
-        String.format("%d Discs discovered",DiscList.size());
-        System.out.println(String.format("%d Discs discovered",DiscList.size()));
-
-
-
-
-
-
-
 
         displayBox.ShowWindow();
 

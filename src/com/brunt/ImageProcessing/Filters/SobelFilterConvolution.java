@@ -1,5 +1,6 @@
 package com.brunt.ImageProcessing.Filters;
 
+import com.brunt.ImageProcessing.Theta;
 import com.brunt.ImageProcessing.Utils;
 
 import java.awt.*;

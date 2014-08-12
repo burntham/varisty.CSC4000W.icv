@@ -1,4 +1,4 @@
-package com.brunt.ImageProcessing.Filters;
+package com.brunt.ImageProcessing;
 
 import java.awt.*;
 
@@ -39,7 +39,6 @@ public class Theta extends Point {
             theta =90;
         else
             theta = 135;
-
 
         return theta;
     }

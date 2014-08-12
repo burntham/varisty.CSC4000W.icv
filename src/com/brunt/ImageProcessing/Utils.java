@@ -83,6 +83,35 @@ public class Utils {
         return newImage;
     }
 
+    public static BufferedImage getRawColouredBufferedImage(int[] inputArr, int width, int height)
+    {
+        BufferedImage newImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+
+        for (int y=0; y<height; y++)
+        {
+            for ( int x = 0; x< width;x ++)
+            {
+                newImage.setRGB(x,y,Math.abs(inputArr[y*width+x]));
+            }
+        }
+        return newImage;
+    }
+
+    public static BufferedImage getIntensityBufferedImage(int[] inputArr, int width, int height)
+    {
+        BufferedImage newImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+
+
+        for (int y=0; y<height; y++)
+        {
+            for ( int x = 0; x< width;x ++)
+            {
+                newImage.setRGB(x,y,getPixelMaxIntensity(inputArr[y*width+x]));
+            }
+        }
+        return newImage;
+    }
+
     /**
      * Calculate the GreyScaleValue
      * @param pix
@@ -91,6 +120,11 @@ public class Utils {
     public static int getPixelAvgIntensity(int pix)
     {
         return (int)(((pix>>16&0xff)+(pix>>8&0xff)+(pix&0xff))/3.0f);
+    }
+
+    public static int getPixelMaxIntensity(int pix)
+    {
+        return Math.max(pix&0xff, Math.max(pix>>8&0xff, pix>>16&0xff));
     }
 
     public static int setGreyIntensity(int pix)

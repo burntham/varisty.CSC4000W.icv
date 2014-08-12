@@ -1,6 +1,6 @@
 package com.brunt.ImageProcessing.Filters2;
 
-import com.brunt.ImageProcessing.Filters.Theta;
+import com.brunt.ImageProcessing.Theta;
 
 import java.util.LinkedList;
 
@@ -10,10 +10,6 @@ import java.util.LinkedList;
 public class SobelFilter2 extends Filter {
     private float[] xFilterColumn = {1f,2f,1f}, xfilterRow={-1f,0f,1f}, yFilterColumn ={1f,0f,-1f}, yFilterRow ={1f,2f,1f};
     private LinkedList<Theta> gradientAngles;
-
-    public SobelFilter2() {
-
-    }
 
     @Override
     public int[] filterImage(int[] original, int width, int height) {
@@ -31,14 +27,12 @@ public class SobelFilter2 extends Filter {
 
         for (int i=0; i<length; i++)
         {
-            if((gX[i]>0) && (gY[i]>0) )
-            {
+                int y=(i/width);
+                int x=i-y*width;
                 gMag[i] = (int) Math.sqrt(Math.pow(gX[i], 2) + Math.pow(gY[i], 2));
-                gradientAngles.add(new Theta((i%width),(i%height),gX[i],gY[i]));
-            }
-
+            if(gMag[i]>0)
+                gradientAngles.add(new Theta((x),(y),gX[i],gY[i]));
         }
-
         return gMag;
     }
 
