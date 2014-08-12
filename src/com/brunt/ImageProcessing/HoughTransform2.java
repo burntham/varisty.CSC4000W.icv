@@ -174,10 +174,8 @@ public class HoughTransform2 {
                 for (int x=0; x<imageWidth;x++)
                 {
                     float intercepts = Math.min(approximateIntercepts(accumulator[ran][y][x]),accumulator[ran][y][x]);
-                    float normaliZed = (intercepts-minIntercepts)/(interceptRange*1.0f);
-                    //float normalizer = //Math.min(1.0f,(accumulator[ran][y][x]*1.0f)/(approximateIntercepts(ran+minRadius)*50));
-                    //temp[y*imageWidth+x] = Math.min(255,Math.max(0,temp[y*imageWidth+x]+(int)((intercepts*(normaliZed*255)))));
-                    temp[y*imageWidth+x] += (intercepts*normaliZed)*255;
+                    float normaliZed = Math.abs((intercepts-minIntercepts)/(interceptRange*1.0f));
+                    temp[y*imageWidth+x] += (intercepts*normaliZed);
                 }
             }
         }

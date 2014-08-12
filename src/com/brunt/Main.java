@@ -112,7 +112,7 @@ public class Main {
         displayBox.AddImage(Utils.getGreyScaleBufferedImage(blurred,width,height));
         displayBox.AddImage(Utils.getIntensityBufferedImage(sobelled,width,height));
         displayBox.AddImage(Utils.getGreyScaleBufferedImage(edges,width,height));
-        //displayBox.AddImage(houghTransform.drawAccumulator());
+        displayBox.AddImage(houghTransform.drawAccumulator());
         displayBox.AddImage(detected);
         displayBox.ShowWindow();
 
