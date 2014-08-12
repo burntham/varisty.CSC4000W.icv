@@ -48,7 +48,7 @@ public class Main {
         displayBox.AddImage(newCannied);
 
         HoughTransform2 newHough = new HoughTransform2(14,60,1.4f,2);
-        LinkedList<Discs> newHoughDiscs = newHough.detectDiscs(original,width,height,14,16,1.4f,2);
+        LinkedList<Discs> newHoughDiscs = newHough.detectDiscs(original,width,height,10,60,1.4f,2);
         System.out.println(String.format("%d discs found with new Hough", newHoughDiscs.size()));
         BufferedImage newHoughSpace = newHough.drawAccumulator();
 
@@ -72,6 +72,8 @@ public class Main {
         displayBox.AddImage(detected);
 
         displayBox.ShowWindow();
+
+        ImageManager.WriteImage(String.format("%s-detected.gif",imageName.split(".gif")[0]),detected);
 
         if (originalImage == null)
         {
