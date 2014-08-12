@@ -58,7 +58,6 @@ public class HoughTransform {
             int x = i-y*imageWidth;
             edgeDetected[y][x] = edges[i];
         }
-
         for ( int y=0; y<imageHeight;y++)
         {
             for ( int x=0; x<imageWidth; x++)

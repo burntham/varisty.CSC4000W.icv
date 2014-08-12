@@ -11,6 +11,7 @@ import com.sun.javafx.binding.StringFormatter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -18,48 +19,82 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+
+        /**
+         * paramaters
+         */
+        float sigma = 1.4f;
+        int gausRadius =2;
+        int minCircleRadius = 10;
+        int maxCircleRadius = 150;
+        int lowT = 50;//still to be implemented
+        int highT = 60;
+
+        /**
+         * Initialization
+         */
         Scanner input = new Scanner(System.in);
-        String imageName = (args.length>0)? args[0] : input.nextLine();
+        BufferedImage originalImage;
+        int[] original;
+        int width,height;
+        String imageName=" ";
 
-        //create window
-        Window displayBox = new Window(imageName);
+        imageName = (args.length > 0) ? args[0] : "";
+        File file = new File(imageName);
 
-        //Load the original Image
-        BufferedImage originalImage = ImageManager.ReadImage(args[0]);
+        while((!file.canRead()))
+        {
+            System.out.println("Please enter a valid filename");
+            imageName = input.nextLine();
+            file = new File(imageName);
+        }
+
+        System.out.println("Please enter min radius");
+        minCircleRadius = input.nextInt();
+
+        System.out.println("Please enter max radius");
+        maxCircleRadius = input.nextInt();
+
+
+        originalImage = ImageManager.ReadImage(imageName);
+        original = Utils.createIntArrayFromImg(originalImage);
+        width = originalImage.getWidth();
+        height = originalImage.getHeight();
+
+        Window displayBox = new Window("");
         displayBox.AddImage(originalImage);
-        int[] original = Utils.createIntArrayFromImg(originalImage);
-        int width = originalImage.getWidth(), height = originalImage.getHeight();
 
-        GaussianFilter2 newG = new GaussianFilter2(1.4f,2);
-        int[] gaussed = newG.filterImage(original,originalImage.getWidth(),originalImage.getHeight());
-        BufferedImage newGaussed = Utils.getGreyScaleBufferedImage(gaussed,width,height);
-        displayBox.AddImage(newGaussed);
+        /**
+         * Display various operations
+         */
 
-        //Test New Sobel 2 Filter
-        SobelFilter2 newS = new SobelFilter2();
-        int[] sobelled = newS.filterImage(gaussed,originalImage.getWidth(), originalImage.getHeight());
-        BufferedImage newSobelled = Utils.getGreyScaleBufferedImage(sobelled, originalImage.getWidth(), originalImage.getHeight());
-        displayBox.AddImage(newSobelled);
+        //Filters and operations to display different steps
+        GaussianFilter2 gaussFilter = new GaussianFilter2(sigma,gausRadius);
+        SobelFilter2 sobelOperator = new SobelFilter2();
+        CannyEdgeDetection cannyDetection = new CannyEdgeDetection(lowT, highT);
+        HoughTransform2 houghTransform = new HoughTransform2(minCircleRadius,maxCircleRadius,sigma,gausRadius);
 
-        //Test New CannyEdgeDetector
-        CannyEdgeDetection newCan = new CannyEdgeDetection(0,0);
-        int[] cannied = newCan.detectEdges(original,originalImage.getWidth(), originalImage.getHeight() );
-        BufferedImage newCannied = Utils.getRawColouredBufferedImage(cannied, originalImage.getWidth(), originalImage.getHeight());
-        displayBox.AddImage(newCannied);
+        //step 1 Gaussian Blur
+        int[] blurred = gaussFilter.filterImage(original,width,height);
 
-        HoughTransform2 newHough = new HoughTransform2(14,60,1.4f,2);
-        LinkedList<Discs> newHoughDiscs = newHough.detectDiscs(original,width,height,10,60,1.4f,2);
-        System.out.println(String.format("%d discs found with new Hough", newHoughDiscs.size()));
-        BufferedImage newHoughSpace = newHough.drawAccumulator();
+        //step 2 Apply Sobel Operator -> note this is gradient magnitudes
+        int[] sobelled = sobelOperator.filterImage(blurred,width,height);
 
-        displayBox.AddImage(newHoughSpace);
+        //step 3 Apply CannyEdge Detection (note, this filter implements the sobel operator, so the blurred data is passed instead)
+        //This redoes step 1 and 2 aswell as a nonmaximum supression
+        //still to implement hysteresis
+        int edges[]=cannyDetection.detectEdges(original,width,height);
+
+        //step 4 Apply Hough Transform
+        LinkedList<Discs> detectedDiscs= houghTransform.detectDiscs(original,width,height,minCircleRadius,maxCircleRadius,sigma,gausRadius);
 
 
         BufferedImage detected = new BufferedImage(originalImage.getWidth(),originalImage.getHeight(),BufferedImage.TYPE_INT_RGB);
         Graphics2D gDet = detected.createGraphics();
         gDet.drawImage(originalImage,null,null);
         gDet.setColor(Color.red);
-        Iterator<Discs> discIterator = newHoughDiscs.iterator();
+        Iterator<Discs> discIterator = detectedDiscs.iterator();
+        System.out.println(String.format("%d discs detected:",detectedDiscs.size()));
         while(discIterator.hasNext())
         {
             Discs testDisc = discIterator.next();
@@ -69,8 +104,16 @@ public class Main {
             gDet.drawOval(x-radius,y-radius,diameter,diameter);
         }
         gDet.dispose();
-        displayBox.AddImage(detected);
 
+        /**
+         * Draw all the stages to the window!
+         */
+
+        displayBox.AddImage(Utils.getGreyScaleBufferedImage(blurred,width,height));
+        displayBox.AddImage(Utils.getIntensityBufferedImage(sobelled,width,height));
+        displayBox.AddImage(Utils.getGreyScaleBufferedImage(edges,width,height));
+        //displayBox.AddImage(houghTransform.drawAccumulator());
+        displayBox.AddImage(detected);
         displayBox.ShowWindow();
 
         ImageManager.WriteImage(String.format("%s-detected.gif",imageName.split(".gif")[0]),detected);
