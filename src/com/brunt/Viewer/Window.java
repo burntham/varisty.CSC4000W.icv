@@ -22,7 +22,6 @@ public class Window extends JFrame {
     {
         //convert image to label:
         JLabel imageLabel = new JLabel(new ImageIcon(img));
-
         imagePanel.add(imageLabel);
 
     }

@@ -4,6 +4,7 @@ import java.awt.*;
 
 /**
  * Created by Daniel on 8/10/2014.
+ * Stores Gradient Angles
  */
 public class Theta extends Point {
     private int theta;
@@ -23,6 +24,12 @@ public class Theta extends Point {
         return theta;
     }
 
+    /**
+     * Calculate values for Theta
+     * @param gX Gradient in X
+     * @param gY Gradient in Y
+     * @return Returns a value for theta in one of four quadrants
+     */
     private int calculateTheta(int gX, int gY)
     {
         double temp = 0.0f;

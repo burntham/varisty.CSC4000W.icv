@@ -1,12 +1,6 @@
 import com.brunt.ImageProcessing.*;
-import com.brunt.ImageProcessing.Filters.GaussianFilterConvolution;
-import com.brunt.ImageProcessing.Filters.SobelFilterConvolution;
-import com.brunt.ImageProcessing.Filters2.CannyEdgeDetection;
-import com.brunt.ImageProcessing.Filters2.GaussianFilter2;
-import com.brunt.ImageProcessing.Filters2.SobelFilter2;
+import com.brunt.ImageProcessing.Filters2.*;
 import com.brunt.Viewer.Window;
-import com.sun.javafx.binding.StringFormatter;
-
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -107,7 +101,6 @@ public class Main {
         /**
          * Draw all the stages to the window!
          */
-
         displayBox.AddImage(Utils.getGreyScaleBufferedImage(blurred,width,height));
         displayBox.AddImage(Utils.getIntensityBufferedImage(sobelled,width,height));
         displayBox.AddImage(Utils.getGreyScaleBufferedImage(edges,width,height));
@@ -115,11 +108,9 @@ public class Main {
         displayBox.AddImage(detected);
         displayBox.ShowWindow();
 
-        ImageManager.WriteImage(String.format("%s-detected.gif",imageName.split(".gif")[0]),detected);
-
-        if (originalImage == null)
-        {
-            System.out.printf("Image %s failed to load", args[0]);
-        }
+        /**
+         * Write the feature detected image to a file
+         */
+        ImageManager.WriteImage(String.format("%s-detected",imageName.split(".gif")[0]),detected);
     }
 }

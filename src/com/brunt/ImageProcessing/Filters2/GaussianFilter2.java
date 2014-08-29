@@ -2,10 +2,9 @@ package com.brunt.ImageProcessing.Filters2;
 
 import com.brunt.ImageProcessing.Utils;
 
-import java.awt.image.BufferedImage;
-
 /**
  * Created by Daniel on 8/11/2014.
+ * Gaussian Filter
  */
 public class GaussianFilter2 extends Filter {
 
@@ -19,9 +18,14 @@ public class GaussianFilter2 extends Filter {
         {
             sum+=gFilter[i];
         }
-
     }
 
+    /**
+     * Generate 1D Gauss Filter (can be used for 2D filtering too!)
+     * @param sigma
+     * @param radius Filter radius
+     * @return
+     */
     private float[] initFilter( float sigma, int radius)
     {
         float[] newFilter = new float[radius*2+1];
@@ -29,8 +33,6 @@ public class GaussianFilter2 extends Filter {
         {
             newFilter[i] = (float)Utils.getGaussian(i-radius,sigma);
         }
-
-
         return newFilter;
     }
 

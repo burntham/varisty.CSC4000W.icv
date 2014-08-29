@@ -2,12 +2,13 @@ package com.brunt.ImageProcessing.Filters2;
 
 /**
  * Created by Daniel on 8/11/2014.
+ * Filter Base class
+ * Provides Methods for 1D convolution filtering and 2D separable convolutions
  */
 public abstract class Filter {
 
     /**
      * Set call filterImage to create a new filtererd int[] dataset,
-     * @return
      */
     public abstract int[] filterImage(int[] original, int width, int height);
 
@@ -18,7 +19,7 @@ public abstract class Filter {
         int columns = width;
         int rows = height;
 
-        for ( int y = 0; y<rows; y++)
+        for ( int y = 0; y<rows*columns; y+=width)
         {
             for (int x = 0; x <columns; x++)
             {
@@ -33,57 +34,20 @@ public abstract class Filter {
                         index = columns-1;
                     else
                         index = x-offset+j;
-                    newValue += (int)input[y*width+index]*filter[j];
+                    newValue += (int)input[y+index]*filter[j];
                 }
-                filtered[y*width+x] = (int)newValue;
+                filtered[y+x] = (int)newValue;
             }
         }
         return filtered;
     }
 
-
-//    /**
-//     * Do a 1D Convolution by rows and output to an existing array
-//     * @param input
-//     * @param output
-//     * @param width
-//     * @param height
-//     * @param filter
-//     */
-//    private void filter1DConvolution(int[] input,int[] output, int width,int height, float[] filter)
-//    {
-//        int offset = filter.length/2;
-//        int columns = width;
-//        int rows = height;
-//
-//        for ( int y = 0; y<rows; y++)
-//        {
-//            for (int x = 0; x <columns; x++)
-//            {
-//                float newValue = 0.0f;
-//
-//                for ( int j =0; j<filter.length;j++)
-//                {
-//                    int index=0;
-//                    if ( x- offset+j <0)
-//                        index=0;
-//                    else if(x-offset+j>=columns)
-//                        index = columns-1;
-//                    else
-//                        index = x-offset+j;
-//                    newValue += (int)input[y*width+index]*filter[j];
-//                }
-//                output[y*width+x] = (int)newValue;
-//            }
-//        }
-//    }
-
+    //To be done: Implement in place transpose
     /**
      * transposeArr will output a transposed array to outputArr if the argument is passed
      * @param width
      * @param height
      * @param inputArr
-     * @param outputArr
      */
     private int[] transposeArr(int[] inputArr, int width, int height )
     {
@@ -98,6 +62,15 @@ public abstract class Filter {
         return outputArr;
     }
 
+    /**
+     * Perform a 2D Seperable Convolution filter
+     * @param inputArr image stored in int array
+     * @param width width of image
+     * @param height height of image
+     * @param filterX Row filter
+     * @param filterY Column filter
+     * @return
+     */
     protected int[] filter2DSeperableConvolution(int[] inputArr, int width, int height, float[] filterX, float[] filterY)
     {
         int[] firstFilter= filter1DConvolution(inputArr,width,height,filterX);
@@ -110,11 +83,5 @@ public abstract class Filter {
         return transposed2;
     }
 
-    private void printTest(int[] arr)
-    {
-        for (int i=0;i<arr.length;i++)
-            System.out.print(" "+arr[i]);
-        System.out.println();
-    }
 
 }

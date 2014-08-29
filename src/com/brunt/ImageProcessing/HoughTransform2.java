@@ -10,6 +10,7 @@ import java.util.ListIterator;
 
 /**
  * Created by Daniel on 8/10/2014.
+ * Hough Transform Disc detection
  */
 public class HoughTransform2 {
     private int[][][] accumulator;
@@ -27,6 +28,17 @@ public class HoughTransform2 {
 
     }
 
+    /**
+     * Process the image and return a Linked list containing the detected discs
+     * @param original The image int arr
+     * @param width image width
+     * @param height image height
+     * @param minRadius The minimum disc radius to search for
+     * @param maxRadius The maximum disc radius to search for
+     * @param sigma Gauss function Sigma
+     * @param gaussRadius Gauss filter Radius
+     * @return
+     */
     public LinkedList<Discs> detectDiscs(int[] original,int width,int height, int minRadius, int maxRadius, float sigma,int gaussRadius)
     {
         this.minRadius = minRadius;
@@ -39,16 +51,17 @@ public class HoughTransform2 {
         int[] blurred = gaussianFilter.filterImage(original,width,height);
         int[] edgeDetected = cannyDetector.detectEdges(blurred,width,height);
         LinkedList<Point> edges = cannyDetector.getEdges();
-        populateAcummulator(edges);
+        populateAccumulator(edges);
         LinkedList<Discs> discList = exctractDiscsFromAcc();
 
         return discList;
     }
 
     /**
-     * Populate the accumulator
+     * Populates the accumulator with circles used to detect discs in the oriignal image (generates the hough space)
+     * @param edges linked list containing the detected edges
      */
-    private void populateAcummulator(LinkedList<Point> edges)
+    private void populateAccumulator(LinkedList<Point> edges)
     {
         ListIterator<Point> edgeIter=  edges.listIterator();
 
@@ -65,7 +78,7 @@ public class HoughTransform2 {
 
     /**
      * Generate a LinkedList of discs, by detecting local maxima in accumulator
-     * @return
+     * @return Linked list of discs
      */
     private LinkedList<Discs> exctractDiscsFromAcc()
     {
@@ -156,6 +169,10 @@ public class HoughTransform2 {
                 accumulator[radius- minRadius][y][x] +=1;
     }
 
+    /**
+     * Return a Buffered Image for a view of the Hough space
+     * @return
+     */
     public BufferedImage drawAccumulator()
     {
         int radiusRange = maxRadius-minRadius;

@@ -1,15 +1,13 @@
 package com.brunt.ImageProcessing.Filters2;
 
 import com.brunt.ImageProcessing.Theta;
-import com.sun.javafx.geom.Edge;
-import sun.awt.image.ImageWatched;
-
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
 /**
  * Created by Daniel on 8/11/2014.
+ * Almost complete Canny edge detection : Still requires Hysteresis thresholding and basic thresholding after Gaussian blur
  */
 public class CannyEdgeDetection {
     private GaussianFilter2 gaussFilter;
@@ -25,6 +23,13 @@ public class CannyEdgeDetection {
         this.tHigh = tHigh;
     }
 
+    /**
+     * Process image and get an array of detected Edges
+     * @param original
+     * @param width
+     * @param height
+     * @return
+     */
     public int[] detectEdges(int[] original, int width, int height)
     {
         int[] gaussedImage=gaussFilter.filterImage(original,width,height);
@@ -34,6 +39,14 @@ public class CannyEdgeDetection {
         return suppressedSobel;
     }
 
+    /**
+     * Reduce Edges through non-maximum supression
+     * @param original
+     * @param width
+     * @param height
+     * @param gradients
+     * @return
+     */
     private int[] nonMaximSupression(int[] original, int width, int height, LinkedList<Theta> gradients)
     {
         edges = new LinkedList<Point>();
@@ -70,11 +83,24 @@ public class CannyEdgeDetection {
         return newSupressed;
     }
 
+    /**
+     * Get a LinkedList of Edges found by the Canny Detection
+     * @return
+     */
     public LinkedList<Point> getEdges()
     {
         return edges;
     }
 
+    /**
+     * Prevent Index out of bound errors
+     * @param original
+     * @param width
+     * @param height
+     * @param x
+     * @param y
+     * @return
+     */
     private int safeCheck(int[] original, int width, int height, int x, int y)
     {
         if ((x>=0)&&(x<width))

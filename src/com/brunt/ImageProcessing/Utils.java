@@ -4,12 +4,13 @@ import java.awt.image.BufferedImage;
 
 /**
  * Created by Daniel on 8/10/2014.
+ * Utils Class-> used for odds and ends
  */
 public class Utils {
 
     /**
      * Function used to debug binary operations
-     * @param number
+     * @param number the int value for which binary representation is needed
      */
     public static void printBinary(int number)
     {
@@ -22,51 +23,12 @@ public class Utils {
         System.out.println(number+" is:\n"+binBuffer.toString());
     }
 
-    /**
-     * @param original The Bufferedimage to be converted, removing alpha
-     * @return the int array
-     */
-    public static int[][] ConvertBuffImageToIntArr(BufferedImage original)
-    {
-        int height = original.getHeight(),width = original.getWidth();
-        int[][] intArray = new int[height][width];
-
-        for ( int y=0;y<height;y++)
-        {
-            for ( int x=0; x<width;x++)
-            {
-                intArray[y][x] = original.getRGB(x,y)&0xffffff;
-            }
-        }
-
-        System.out.println("Buffered Image converted to Int Array");
-        return intArray;
-    }
-
-    public static BufferedImage convertIntArrToBufferedImage(int[][] original)
-    {
-        int height=original.length, width = original[0].length;
-        BufferedImage newBuffImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
-        for ( int y=0; y<height;y++)
-        {
-            for (int x=0; x<width;x++)
-            {
-                int newPix = original[y][x];
-                newPix = (newPix>255)?255:newPix;
-                newBuffImage.setRGB(x,y,newPix<<16 | newPix<<8 | newPix);
-            }
-        }
-
-        System.out.println("Int Array converted to Buffered Image");
-
-        return newBuffImage;
-    }
 //FILTERS2 Utils///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Return a GreyScal Version of the array
-     * @param inputArr
-     * @param width
-     * @param height
+     * @param inputArr Image int array
+     * @param width image width
+     * @param height image height
      * @return
      */
     public static BufferedImage getGreyScaleBufferedImage(int[] inputArr, int width, int height)
@@ -122,18 +84,28 @@ public class Utils {
         return (int)(((pix>>16&0xff)+(pix>>8&0xff)+(pix&0xff))/3.0f);
     }
 
+    /**
+     * Get value of highest intensity colour
+     * @param pix
+     * @return
+     */
     public static int getPixelMaxIntensity(int pix)
     {
         return Math.max(pix&0xff, Math.max(pix>>8&0xff, pix>>16&0xff));
     }
 
+    /**
+     * Return an int representing the greyscale intensity
+     * @param pix desired intesnity value 0-255;
+     * @return
+     */
     public static int setGreyIntensity(int pix)
     {
         return (int)((((pix&0xff)<<16) | ((pix&0xff)<<8) | (pix&0xff)));
     }
 
     /**
-     * Gaussian Function
+     * Gaussian Function g(x,sigma)
      * @param x
      * @param sigma
      * @return

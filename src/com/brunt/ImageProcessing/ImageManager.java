@@ -1,17 +1,21 @@
 package com.brunt.ImageProcessing;
 
-import com.sun.javafx.binding.StringFormatter;
-
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 /**
  * Created by Daniel on 8/5/2014.
+ * Image I/O
  */
 public class ImageManager {
+
+    /**
+     * Read the .gif file into a buffered image
+     * @param fileName
+     * @return
+     */
     public static BufferedImage ReadImage(String fileName)
     {
         File file = new File(fileName);
@@ -27,26 +31,26 @@ public class ImageManager {
         return original;
     }
 
-    //Write Buffered Image to a GIF
-    public static boolean WriteImage(String fileName, BufferedImage img)
+    /**
+     * Write the final Buffered Image to a .gif
+     * @param fileName
+     * @param img
+     */
+    public static void WriteImage(String fileName, BufferedImage img)
     {
-        Boolean response = false;
-
         try {
             File file = new File(String.format("%s.gif",fileName));
-            Deb(file.canRead() ? fileName + " Exists already, overwriting" : "writing to " + fileName);
+            Deb(file.canRead() ? fileName + " Exists already, overwriting" : "writing to " + fileName+".gif");
             ImageIO.write(img, "GIF", file);
         }
         catch (IOException e)
         {
             Deb("Error writing to file");
         }
-
-        return response;
     }
     //Lazy debug printing
     public static void Deb(String message)
     {
-        System.out.println(message);
+        System.err.println(message);
     }
 }
